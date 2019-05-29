@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -21,6 +22,10 @@ public class NLService extends NotificationListenerService {
         registerReceiver(nlservicereciver,filter);
     }
 
+    @Override
+    public IBinder onBind(Intent intent) {
+        return super.onBind(intent);
+}
     @Override
     public void onDestroy() {
         super.onDestroy();
