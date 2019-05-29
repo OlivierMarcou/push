@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
+import android.widget.TextView;
 
 public class NLService extends NotificationListenerService {
 
@@ -34,7 +35,7 @@ public class NLService extends NotificationListenerService {
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
-
+        MainPush.temp=sbn.toString();
         Log.i(TAG,"**********  onNotificationPosted");
         Log.i(TAG,"ID :" + sbn.getId() + "\t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
         Intent i = new  Intent("net.arkaine.push.NOTIFICATION_LISTENER_EXAMPLE");

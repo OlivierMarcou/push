@@ -11,20 +11,55 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class MainPush extends AppCompatActivity {
 
-    private TextView txtView;
+    public TextView txtView;
     private NotificationReceiver nReceiver;
+
+    /**     * L'AtomicBoolean qui gère la destruction de la Thread de background     */
+    AtomicBoolean isRunning = new AtomicBoolean(false);
+    /**     * L'AtomicBoolean qui gère la mise en pause de la Thread de background     */
+    AtomicBoolean isPausing = new AtomicBoolean(false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_push);
-        txtView = (TextView) findViewById(R.id.textView);
+        txtView = (TextView) findViewById(R.id.txtView);
         nReceiver = new NotificationReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("net.arkaine.push.NOTIFICATION_LISTENER_EXAMPLE");
-        registerReceiver(nReceiver,filter);
+        registerReceiver(nReceiver, filter);onStart();
+    }
+
+    public void onStart() {
+        super.onStart();
+        Thread background = new Thread(new Runnable() {
+            // Surcharge de la méthode run
+            public void run() {
+                try {
+                    // Si isRunning est à false, la méthode run doit s'arrêter
+                    while ( isRunning.get()) {
+                        // Si l'activité est en pause mais pas morte
+                        while (isPausing.get() && (isRunning.get())) {
+                            // Faire une pause ou un truc qui soulage le CPU (dépend du traitement)
+                            Thread.sleep(2000);
+                        }
+                        Thread.sleep(1000);
+                        ((TextView)findViewById(R.id.txtView)).setText(temp);
+                    }
+                } catch (Throwable t) {
+                    // gérer l'exception et arrêter le traitement
+                }
+            }
+        });
+        //Initialisation des AtomicBooleans
+        isRunning.set(true);
+        isPausing.set(false);
+        //Lancement de la Thread
+        background.start();
     }
 
     protected void onDestroy() {
@@ -54,12 +89,12 @@ public class MainPush extends AppCompatActivity {
             sendBroadcast(i);
         }
     }
-
+    static String temp ="....";
     class NotificationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String temp = intent.getStringExtra("notification_event") + "\n" + txtView.getText();
-            txtView.setText(temp);
+        //    String temp = intent.getStringExtra("notification_event") + "\n" + txtView.getText();
+            txtView.setText("ici");
         }
     }
 }
